@@ -8,21 +8,24 @@ export default function App() {
   const [quote, setQuote] = useState(null);
   const [loadingQuote, setLoadingQuote] = useState(false);
   const [online, setOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
 
   useEffect(() => {
+    const timer = setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const el = cyberRef.current;
     function handleMove(e) {
-      const el = cyberRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width; // 0..1
-      const y = (e.clientY - rect.top) / rect.height; // 0..1
-      // set CSS vars for subtle parallax
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
       el.style.setProperty("--mx", `${(x - 0.5) * 40}px`);
       el.style.setProperty("--my", `${(y - 0.5) * 20}px`);
     }
-
     function handleClick(e) {
-      const el = cyberRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const px = e.clientX - rect.left;
@@ -34,18 +37,14 @@ export default function App() {
       el.appendChild(pulse);
       setTimeout(() => pulse.remove(), 1200);
     }
-
-    function onOnline() { setOnline(true); }
-    function onOffline() { setOnline(false); }
-
-    const el = cyberRef.current;
+    const onOnline = () => setOnline(true);
+    const onOffline = () => setOnline(false);
     if (el) {
       el.addEventListener("mousemove", handleMove);
       el.addEventListener("click", handleClick);
     }
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
-
     return () => {
       if (el) {
         el.removeEventListener("mousemove", handleMove);
@@ -59,12 +58,11 @@ export default function App() {
   async function fetchQuote() {
     setLoadingQuote(true);
     try {
-      const res = await fetch("https://api.quotable.io/random?tags=technology|science");
-      if (!res.ok) throw new Error("Quote fetch failed");
+      const res = await fetch("https://api.quotable.io/random?tags=technology|science|innovation");
       const data = await res.json();
       setQuote(data);
-    } catch (err) {
-      setQuote({ content: "Keep pushing code to the cloud.", author: "CS Tip" });
+    } catch {
+      setQuote({ content: "Push your limits — and your code — to the cloud.", author: "CS642" });
     } finally {
       setLoadingQuote(false);
     }
@@ -72,25 +70,29 @@ export default function App() {
 
   return (
     <div className="auth-wrapper">
-      {/* Left side: welcome + auth form */}
+      {/* Left: Centered Auth Box */}
       <div className="left-side">
         <div className="auth-card">
           <div className="card-head">
-            <div className={`status-dot ${online ? "online" : "offline"}`} title={online ? "Online" : "Offline"} />
+            <div
+              className={`status-dot ${online ? "online" : "offline"}`}
+              title={online ? "Online" : "Offline"}
+            />
             <h1 className="welcome-title">Welcome</h1>
           </div>
 
-          <p className="course-info">CS 642/442 — Cloud Computing</p>
+          <p className="course-info">CS 642/442 — Cloud Computing Portal</p>
 
-          <div className="amplify-box">
+          {/* Centered form container */}
+          <div className="form-wrapper">
             <Authenticator />
           </div>
 
           <div className="interactive-row">
             <button className="mini-btn" onClick={fetchQuote} disabled={loadingQuote}>
-              {loadingQuote ? "Fetching tip..." : "Get Cloud Tip"}
+              {loadingQuote ? "Loading..." : "Get Cloud Tip"}
             </button>
-            <div className="clock">{new Date().toLocaleTimeString()}</div>
+            <div className="clock">{time}</div>
           </div>
 
           {quote && (
@@ -104,12 +106,18 @@ export default function App() {
         </div>
       </div>
 
-      {/* Right side: cyber background */}
+      {/* Right: Cyber Grid */}
       <div className="right-side">
         <div className="cyber-bg" ref={cyberRef}>
-          <div className="grid"></div>
-          <div className="mountain"></div>
-          <div className="glow"></div>
+          <div className="nebula" />
+          <div className="grid" />
+          
+          {/* Instruction text */}
+          <div className="click-hint">
+            Try clicking anywhere on the grid
+          </div>
+          
+          <div className="glow" />
         </div>
       </div>
     </div>
