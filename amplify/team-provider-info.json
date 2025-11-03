@@ -17,6 +17,9 @@
           "appId": "downnn7lxutgv",
           "type": "manual"
         }
+      },
+      "auth": {
+        "webloginf76089c1": {}
       }
     }
   }
