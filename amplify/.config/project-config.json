@@ -1,0 +1,18 @@
+{
+  "whyContinueWithGen1": "I am a current Gen 1 user",
+  "projectName": "weblogin",
+  "version": "3.1",
+  "frontend": "javascript",
+  "javascript": {
+    "framework": "react",
+    "config": {
+      "SourceDir": "scr",
+      "DistributionDir": "dist",
+      "BuildCommand": "npm run build",
+      "StartCommand": "npm start"
+    }
+  },
+  "providers": [
+    "awscloudformation"
+  ]
+}
